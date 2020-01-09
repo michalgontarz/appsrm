@@ -10,7 +10,7 @@ import numpy as np
 import fnmatch
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-UPLOAD_DIRECTORY = "/project/app_uploaded_files"
+UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
 
 
 if not os.path.exists(UPLOAD_DIRECTORY):
