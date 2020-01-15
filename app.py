@@ -70,17 +70,16 @@ app.layout = html.Div( children = [
                                 value = 'log',
                                 labelStyle={"display": "inline-block"},
                         ),
-                        html.P ('Enter min value of frequency in MHz'),
+                        html.P ('Enter min value of frequency in MHz', style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
                         dcc.Input (id = 'min-freq', placeholder = 'Type here', type = 'text', value = '',
-                        ),
+                        style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
                         html.Div (id = 'my-div'),
-                        html.P ('Enter max value of frequency in MHz'),
+                        html.P ('Enter max value of frequency in MHz', style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
                         dcc.Input (id = 'max-freq', placeholder = 'Type here', type = 'text', value = '',
                         ),
                         html.Div (id = 'my-div2')
-                ],
+                ], style={'width': '50%', 'flush': 'right','align': 'center' ,'display': 'inline-block'}
                 ),
-            style = {'width': '100%', 'display': 'flex', 'flex-direction': 'right', 'justify-content': 'center', 'align': 'center', 'justify': 'center', 'textAlign': 'center'}
             ),
             html.Div (children = [
                 dcc.Loading (className = 'dashbio-loading', type = 'circle', children = html.Div (
@@ -103,7 +102,7 @@ app.layout = html.Div( children = [
         html.Div( className = 'row', children = [
                     dcc.RadioItems(
                                 id = 'aggregate-func-type',
-                                options = [{'label': i, 'value': i} for i in ['RMS', 'MIN', 'MAX']],
+                                options = [{'label': i, 'value': i} for i in ['RMS', 'MIN', 'MAX', 'AVG']],
                                 value = 'RMS',
                                 labelStyle={"display": "inline-block"},
                         ),
@@ -149,7 +148,6 @@ def save_files(uploaded_filenames, uploaded_file_contents):
         for name, data in zip (uploaded_filenames, uploaded_file_contents):
             save_file (name, data)
     dff = file_aggregation()
-    print(dff)
     recursively_remove_files(UPLOAD_DIRECTORY)
     return dff.to_json(orient= 'records')
 
@@ -165,7 +163,6 @@ def save_files(uploaded_filenames, uploaded_file_contents):
 def update_graph(data, yaxis_type, min_freq, max_freq):
     dff = pd.read_json(data)
     dff.set_index('Frequency Hz', inplace = True)
-    print(dff)
     traces = []
     for col in dff.columns:
         d = dict (x = dff.index , y = dff[col].values, mode = 'lines', name = col,
@@ -199,7 +196,6 @@ def update_graph_aggregate(data, agg_type):
     dff.set_index('Frequency Hz', inplace = True)
     if agg_type == 'RMS':
         newdff = RMS(dff)
-        print(newdff)
         return {
             'data': [dict (
                 x = newdff['Date'],
@@ -226,7 +222,6 @@ def update_graph_aggregate(data, agg_type):
         }
     elif agg_type == 'MAX':
         newdff = MAX (dff)
-        print (newdff)
         return {
             'data': [dict (
                 x = newdff['Date'],
@@ -253,7 +248,6 @@ def update_graph_aggregate(data, agg_type):
         }
     elif agg_type == 'MIN':
         newdff = MIN (dff)
-        print (newdff)
         return {
             'data': [dict (
                 x = newdff['Date'],
@@ -275,6 +269,32 @@ def update_graph_aggregate(data, agg_type):
                 },
                 yaxis = {
                     'title': 'Min value of Electromagnetic Field Strength [V/m]',
+                },
+            )
+        }
+    else:
+        newdff = AVG (dff)
+        return {
+            'data': [dict (
+                x = newdff['Date'],
+                y = newdff['AVG'],
+                mode = 'markers',
+                marker = dict (
+                    color = 'black',
+                    symbol = 'line-ew',
+                    size = 20,
+                    line = dict (
+                        color = 'black',
+                        width = 1,
+                    ),
+                ),
+            )],
+            'layout': dict (
+                xaxis = {
+                    'title': 'Date',
+                },
+                yaxis = {
+                    'title': 'Avg value of Electromagnetic Field Strength [V/m]',
                 },
             )
         }
@@ -326,10 +346,26 @@ def RMS(Dataframeplot):
         dfObj = dfObj.sort_values ('Date')
         return dfObj
 
+
+def AVG(Dataframeplot):
+    dfObj = pd.DataFrame ([])
+    for col in Dataframeplot.columns:
+        totalsum = Dataframeplot[col]
+        total = Dataframeplot[col].shape
+        sum = totalsum.sum ()
+        AVG = sum / total
+        AVG = float ("%0.3f" % AVG)
+        data = {'Date': col, 'AVG': [AVG]}
+        df = pd.DataFrame (data)
+        dfObj = pd.concat ([dfObj, df], axis = 0)
+    dfObj = dfObj.sort_values ('Date')
+    return dfObj
+
 def MAX(Dataframeplot):
     dfObj = pd.DataFrame ([])
     for col in Dataframeplot.columns:
         MAX = Dataframeplot[col].max()
+        MAX = float ("%0.3f" % MAX)
         data = {'Date': col, 'MAX': [MAX]}
         df = pd.DataFrame (data)
         dfObj = pd.concat ([dfObj, df], axis = 0)
@@ -340,6 +376,7 @@ def MIN(Dataframeplot):
     dfObj = pd.DataFrame ([])
     for col in Dataframeplot.columns:
         MIN = Dataframeplot[col].min()
+        MIN = float ("%0.3f" % MIN)
         data = {'Date': col, 'MIN': [MIN]}
         df = pd.DataFrame (data)
         dfObj = pd.concat ([dfObj, df], axis = 0)
