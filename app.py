@@ -12,8 +12,9 @@ from sqlalchemy import create_engine
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 engine = create_engine(
-'sqlite:///restaurantmenu.db',
+'sqlite:///app.db',
 connect_args={'check_same_thread': False}
 )
 
