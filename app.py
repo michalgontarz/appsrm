@@ -8,10 +8,14 @@ from dash.dependencies import Input, Output
 import pandas as pd
 import numpy as np
 import fnmatch
+from sqlalchemy import create_engine
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
-
+engine = create_engine(
+'sqlite:///restaurantmenu.db',
+connect_args={'check_same_thread': False}
+)
 
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
@@ -149,7 +153,7 @@ def save_files(uploaded_filenames, uploaded_file_contents):
             save_file (name, data)
     dff = file_aggregation()
     recursively_remove_files(UPLOAD_DIRECTORY)
-    return dff.to_json(orient= 'records')
+    return dff.to_sql('dataframe', engine, if_exists = 'replace', index = False)
 
 @app.callback(
      Output("graph", "figure"),
@@ -161,7 +165,7 @@ def save_files(uploaded_filenames, uploaded_file_contents):
      ]
 )
 def update_graph(data, yaxis_type, min_freq, max_freq):
-    dff = pd.read_json(data)
+    dff = pd.read_sql_table('dataframe', con = engine)
     dff.set_index('Frequency Hz', inplace = True)
     traces = []
     for col in dff.columns:
@@ -192,7 +196,7 @@ def update_graph(data, yaxis_type, min_freq, max_freq):
     ]
 )
 def update_graph_aggregate(data, agg_type):
-    dff = pd.read_json(data)
+    dff = pd.read_sql('dataframe', con = engine)
     dff.set_index('Frequency Hz', inplace = True)
     if agg_type == 'RMS':
         newdff = RMS(dff)
@@ -389,7 +393,6 @@ def recursively_remove_files(f):
     elif os.path.isdir(f):
         for fi in os.listdir(f):
             recursively_remove_files(os.path.join(f, fi))
-
 
 
 if __name__ == '__main__':
