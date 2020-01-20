@@ -9,6 +9,8 @@ import pandas as pd
 import numpy as np
 import fnmatch
 from sqlalchemy import create_engine
+import contextlib
+from sqlalchemy import MetaData
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
@@ -16,6 +18,13 @@ engine = create_engine(
 'sqlite:///app.db',
 connect_args={'check_same_thread': False}
 )
+meta = MetaData()
+
+with contextlib.closing(engine.connect()) as con:
+    trans = con.begin()
+    for table in reversed(meta.sorted_tables):
+        con.execute(table.delete())
+    trans.commit()
 
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
