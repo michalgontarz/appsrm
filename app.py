@@ -99,7 +99,7 @@ app.layout = html.Div( children = [
                 id = 'graph-div',
                 children = [ dcc.Graph (
                 id = 'graph',
-                config = {'displayModeBar': True, 'scrollZoom': True, 'toImageButtonOptions': {"width": None, "height": None}},
+                config = {'displayModeBar': True,'displaylogo' : False, 'scrollZoom': True, 'toImageButtonOptions': {"width": None, "height": None}},
                 ),
                 ]
             ),
@@ -126,7 +126,7 @@ app.layout = html.Div( children = [
                 id = 'graph-div2',
                 children = [ dcc.Graph (
                 id = 'aggregate-graph',
-                config = {'displayModeBar': True, 'scrollZoom': True, 'toImageButtonOptions': {"width": None, "height": None}},
+                config = {'displayModeBar': True, 'displaylogo' : False, 'scrollZoom': True, 'toImageButtonOptions': {"width": None, "height": None}},
                 ),
                 ]
             ),
