@@ -66,10 +66,6 @@ app.layout = html.Div( children = [
     )
             ],
     ),
-    html.Div(
-        id='table',
-        style={'display': 'none'}
-    ),
     html.P(),
     dcc.Tabs([
         dcc.Tab(label='Widok widma', children=[
@@ -167,7 +163,6 @@ def save_files(uploaded_filenames, uploaded_file_contents):
 @app.callback(
      Output("graph", "figure"),
     [
-     Input('table', 'children'),
      Input('crossfilter-yaxis-type', 'value'),
      Input('min-freq', 'value'),
      Input('max-freq', 'value'),
@@ -200,7 +195,6 @@ def update_graph(data, yaxis_type, min_freq, max_freq):
 @app.callback(
      Output("aggregate-graph", "figure"),
     [
-     Input('table', 'children'),
      Input('aggregate-func-type', 'value')
     ]
 )
