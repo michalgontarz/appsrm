@@ -108,7 +108,7 @@ app.layout = html.Div( children = [
     ]),
     dcc.Tab(label = 'Funkcje analityczne', children = [
         html.P (
-            """Wybierz jedną z funkcji aby odczytać wartość skuteczną (RMS), wartość minimalną, maksymalną i średnią natężenia pola elektromagnetycznego""",
+            """Wybierz jedną z funkcji aby odczytać wartość skuteczną (RMS), wartość minimalną, maksymalną i średnią natężenia pola elektrycznego""",
             style = {
                 'textAlign': 'center', }
         ),
