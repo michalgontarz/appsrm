@@ -190,7 +190,7 @@ def update_graph(data, yaxis_type, min_freq, max_freq):
                      'autorange': 'true',
                      'animate': False
                      },
-            yaxis = {'title': 'Electromagnetic Field Strength [V/m]',
+            yaxis = {'title': 'E-Field Strength [V/m]',
                      'type': 'log' if yaxis_type == 'log' else 'Linear',
                      'autorange': 'true',
                      'animate': False
@@ -229,7 +229,7 @@ def update_graph_aggregate(data, agg_type):
                     'title': 'Date',
                 },
                 yaxis = {
-                    'title': 'RMS',
+                    'title': 'RMS of E-Field',
                 },
             )
         }
@@ -255,7 +255,7 @@ def update_graph_aggregate(data, agg_type):
                     'title': 'Date',
                 },
                 yaxis = {
-                    'title': 'Max value of Electromagnetic Field Strength [V/m]',
+                    'title': 'Max value of E-Field Strength [V/m]',
                 },
             )
         }
@@ -281,7 +281,7 @@ def update_graph_aggregate(data, agg_type):
                     'title': 'Date',
                 },
                 yaxis = {
-                    'title': 'Min value of Electromagnetic Field Strength [V/m]',
+                    'title': 'Min value of E-Field Strength [V/m]',
                 },
             )
         }
@@ -307,7 +307,7 @@ def update_graph_aggregate(data, agg_type):
                     'title': 'Date',
                 },
                 yaxis = {
-                    'title': 'Avg value of Electromagnetic Field Strength [V/m]',
+                    'title': 'Avg value of E-Field Strength [V/m]',
                 },
             )
         }
