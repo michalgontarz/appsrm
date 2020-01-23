@@ -83,12 +83,12 @@ app.layout = html.Div( children = [
                                 value = 'log',
                                 labelStyle={"display": "inline-block"},
                         ),
-                        html.P ('Enter min value of frequency in MHz', style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
-                        dcc.Input (id = 'min-freq', placeholder = 'Type here', type = 'text', value = '',
+                        html.P ('Wprowadź wartość min częstotliwości w MHz', style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
+                        dcc.Input (id = 'min-freq', placeholder = 'Wpisz tutaj', type = 'text', value = '',
                         style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
                         html.Div (id = 'my-div'),
-                        html.P ('Enter max value of frequency in MHz', style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
-                        dcc.Input (id = 'max-freq', placeholder = 'Type here', type = 'text', value = '',
+                        html.P ('Wprowadź wartość max częstotliwości w MHz', style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
+                        dcc.Input (id = 'max-freq', placeholder = 'Wpisz tutaj', type = 'text', value = '',
                         ),
                         html.Div (id = 'my-div2')
                 ], style={'width': '50%', 'flush': 'right','align': 'center' ,'display': 'inline-block'}
@@ -108,7 +108,7 @@ app.layout = html.Div( children = [
     ]),
     dcc.Tab(label = 'Funkcje analityczne', children = [
         html.P (
-            """Wybierz jedną z funkcji aby odczytać wartość skuteczną (RMS), wartość minimalną i maksymalną natężenia pola elektromagnetycznego""",
+            """Wybierz jedną z funkcji aby odczytać wartość skuteczną (RMS), wartość minimalną, maksymalną i średnią natężenia pola elektromagnetycznego""",
             style = {
                 'textAlign': 'center', }
         ),
