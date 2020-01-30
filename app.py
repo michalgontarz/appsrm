@@ -162,7 +162,7 @@ def save_files(uploaded_filenames, uploaded_file_contents):
             save_file (name, data)
     dff = file_aggregation()
     recursively_remove_files(UPLOAD_DIRECTORY)
-    return dff.to_sql('dataframe', engine, if_exists = 'replace', index = False)
+    return dff.to_json(orient= 'records')
 
 @app.callback(
      Output("graph", "figure"),
@@ -174,7 +174,7 @@ def save_files(uploaded_filenames, uploaded_file_contents):
      ]
 )
 def update_graph(data, yaxis_type, min_freq, max_freq):
-    dff = pd.read_sql_table('dataframe', con = engine)
+    dff = pd.read_json(data)
     dff.set_index('Frequency Hz', inplace = True)
     traces = []
     for col in dff.columns:
@@ -205,7 +205,7 @@ def update_graph(data, yaxis_type, min_freq, max_freq):
     ]
 )
 def update_graph_aggregate(data, agg_type):
-    dff = pd.read_sql('dataframe', con = engine)
+    dff = pd.read_json(data)
     dff.set_index('Frequency Hz', inplace = True)
     if agg_type == 'RMS':
         newdff = RMS(dff)
