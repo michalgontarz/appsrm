@@ -157,11 +157,10 @@ def uploaded_files():
             files.append(filename)
     return files
 
-@app.callback(
+@cache.memoize(
     Output("table", "children"),
     [Input("upload-data", "filename"), Input("upload-data", "contents")],
 )
-@cache.memoize()
     def save_files(uploaded_filenames, uploaded_file_contents):
         if uploaded_filenames is not None and uploaded_file_contents is not None:
             for name, data in zip (uploaded_filenames, uploaded_file_contents):
