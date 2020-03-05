@@ -34,6 +34,11 @@ if not os.path.exists(UPLOAD_DIRECTORY):
 server = Flask(__name__)
 app = dash.Dash(server=server, external_stylesheets=external_stylesheets)
 
+#cache - performance try
+cache = Cache(app.server, config={
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': 'cache-directory'
+})
 
 @server.route("/download/<path:path>")
 def download(path):
@@ -156,13 +161,14 @@ def uploaded_files():
     Output("table", "children"),
     [Input("upload-data", "filename"), Input("upload-data", "contents")],
 )
-def save_files(uploaded_filenames, uploaded_file_contents):
-    if uploaded_filenames is not None and uploaded_file_contents is not None:
-        for name, data in zip (uploaded_filenames, uploaded_file_contents):
-            save_file (name, data)
-    dff = file_aggregation()
-    recursively_remove_files(UPLOAD_DIRECTORY)
-    return dff.to_json(orient= 'records')
+@cache.memoize()
+    def save_files(uploaded_filenames, uploaded_file_contents):
+        if uploaded_filenames is not None and uploaded_file_contents is not None:
+            for name, data in zip (uploaded_filenames, uploaded_file_contents):
+                save_file (name, data)
+        dff = file_aggregation()
+        recursively_remove_files(UPLOAD_DIRECTORY)
+        return dff.to_json(orient= 'records')
 
 @app.callback(
      Output("graph", "figure"),
