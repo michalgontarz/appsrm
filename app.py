@@ -34,12 +34,6 @@ if not os.path.exists(UPLOAD_DIRECTORY):
 server = Flask(__name__)
 app = dash.Dash(server=server, external_stylesheets=external_stylesheets)
 
-#cache - performance try
-cache = Cache(app.server, config={
-    'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': 'cache-directory'
-})
-
 @server.route("/download/<path:path>")
 def download(path):
     """Serve a file from the upload directory."""
@@ -157,7 +151,7 @@ def uploaded_files():
             files.append(filename)
     return files
 
-@cache.memoize(
+@app.callback(
     Output("table", "children"),
     [Input("upload-data", "filename"), Input("upload-data", "contents")],
 )
