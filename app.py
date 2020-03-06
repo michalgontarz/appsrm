@@ -313,6 +313,7 @@ def update_graph_aggregate(data, agg_type):
 
 
 def file_aggregation():
+    try:
         filenames = glob.glob (UPLOAD_DIRECTORY + "/*.csv")
         dfObj = pd.DataFrame ([])
         for file in filenames:
@@ -342,6 +343,11 @@ def file_aggregation():
         else:
             dfObj['Frequency Hz'] = dfObj.index
             return dfObj
+       except Exception as e:
+       print(e)
+                return html.Div([
+            'Błąd w odczycie pliku.'
+        ])
 
 def RMS(Dataframeplot):
         dfObj = pd.DataFrame ([])
