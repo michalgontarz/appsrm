@@ -344,10 +344,10 @@ def file_aggregation():
             dfObj['Frequency Hz'] = dfObj.index
             return dfObj
        except Exception as e:
-       print(e)
+        print(e)
                 return html.Div([
             'Błąd w odczycie pliku.'
-        ])
+            ])
 
 def RMS(Dataframeplot):
         dfObj = pd.DataFrame ([])
