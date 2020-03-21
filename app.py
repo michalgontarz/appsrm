@@ -11,6 +11,7 @@ import fnmatch
 from sqlalchemy import create_engine
 import contextlib
 from sqlalchemy import MetaData
+from ludwig.utils import data_utils
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
@@ -68,7 +69,10 @@ app.layout = html.Div( children = [
         html.Div(
         id='table',
         style={'display': 'none'}
+
     ),
+
+
     html.P(),
     dcc.Tabs([
         dcc.Tab(label='Widok widma', children=[
@@ -82,14 +86,22 @@ app.layout = html.Div( children = [
                                 value = 'log',
                                 labelStyle={"display": "inline-block"},
                         ),
-                        html.P ('Wprowadź wartość min częstotliwości w MHz', style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
+                        html.Div(className = 'row', children = [
+                            dcc.RadioItems(
+                                id = 'func-type',
+                                options = [{'label': i, 'value': i} for i in ['ALL','ACT', 'MIN', 'MAX', 'AVG']],
+                                value = 'ALL',
+                                labelStyle = {"display": "inline-block"},
+                            ),
+                        ],),
+                        html.P ('Wprowadź wartość min częstotliwości w MHz', style={'width': '22%', 'float': 'left', 'display': 'inline-block'}),
                         dcc.Input (id = 'min-freq', placeholder = 'Wpisz tutaj', type = 'text', value = '',
-                        style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
+                        style={'width': '15%', 'float': 'left', 'display': 'inline-block'}),
                         html.Div (id = 'my-div'),
-                        html.P ('Wprowadź wartość max częstotliwości w MHz', style={'width': '20%', 'float': 'left', 'display': 'inline-block'}),
-                        dcc.Input (id = 'max-freq', placeholder = 'Wpisz tutaj', type = 'text', value = '',
+                        html.P ('Wprowadź wartość max częstotliwości w MHz', style={'width': '23%', 'float': 'left', 'display': 'inline-block'}),
+                        dcc.Input (id = 'max-freq', placeholder = 'Wpisz tutaj', type = 'text', value = '', style={'width': '15%', 'float': 'left', 'display': 'inline-block'}
                         ),
-                        html.Div (id = 'my-div2')
+                        html.Div (id = 'my-div2'),
                 ], style={'width': '50%', 'flush': 'right','align': 'center' ,'display': 'inline-block'}
                 ),
             ),
@@ -156,12 +168,15 @@ def uploaded_files():
     [Input("upload-data", "filename"), Input("upload-data", "contents")],
 )
 def save_files(uploaded_filenames, uploaded_file_contents):
+    try:
         if uploaded_filenames is not None and uploaded_file_contents is not None:
-            for name, data in zip (uploaded_filenames, uploaded_file_contents):
-                save_file (name, data)
+            for name, data in zip(uploaded_filenames, uploaded_file_contents):
+                save_file(name, data)
         dff = file_aggregation()
         recursively_remove_files(UPLOAD_DIRECTORY)
-        return dff.to_json(orient= 'records')
+        return dff.to_json(orient = 'records')
+    except Exception as e:
+        return html.Div(['There was an error processing this file.'])
 
 @app.callback(
      Output("graph", "figure"),
@@ -170,11 +185,17 @@ def save_files(uploaded_filenames, uploaded_file_contents):
      Input('crossfilter-yaxis-type', 'value'),
      Input('min-freq', 'value'),
      Input('max-freq', 'value'),
+     Input('func-type', 'value')
      ]
 )
-def update_graph(data, yaxis_type, min_freq, max_freq):
+def update_graph(data, yaxis_type, min_freq, max_freq, func_type):
     dff = pd.read_json(data)
     dff.set_index('Frequency Hz', inplace = True)
+    if func_type == 'AVG': dff = dff.filter(regex = 'AVG')
+    if func_type == 'ACT': dff = dff.filter(regex = 'ACT')
+    if func_type == 'MIN': dff = dff.filter(regex = 'MIN')
+    if func_type == 'MAX': dff = dff.filter(regex = 'MAX')
+
     traces = []
     for col in dff.columns:
         d = dict (x = dff.index , y = dff[col].values, mode = 'lines', name = col,
@@ -315,26 +336,67 @@ def update_graph_aggregate(data, agg_type):
 def file_aggregation():
     try:
         filenames = glob.glob (UPLOAD_DIRECTORY + "/*.csv")
+        print(UPLOAD_DIRECTORY)
         dfObj = pd.DataFrame ([])
+        colnames = '1234'
         for file in filenames:
             if not fnmatch.fnmatch (file, '*HEADER.csv'):
-                df = pd.read_csv (file, delimiter = ';', encoding = "ISO-8859–1")
+                df = pd.read_csv(file, delimiter = ';', encoding = "ISO-8859–1", header=None, names = colnames, na_values='-', sep = ',')
+                df = df.fillna(0)
+                result_type = df[df.iloc[:,0].str.contains('^Result', regex = True)]
+                df = df.loc[:, (df != 0).any(axis = 0)]
+                dfcol=len(df.columns)
                 loc_date =  df[df.iloc[:,0].str.contains('^Date', regex = True)]
-                Date = loc_date.iloc[0][1]
+                Date = loc_date.iloc[0, 1]
                 loc_time = df[df.iloc[:,0].str.contains('^Time', regex = True)]
                 Time = loc_time.iloc[0][1]
                 Dataframe = Date + " " + Time
-                frec_position = df[df.iloc[:, 0].str.contains ('^Frequency', regex = True)]
-                frec_position = frec_position.index.item()
-                headers = df.iloc[frec_position]
-                new_df = pd.DataFrame (df.values[frec_position+1:], columns = headers)
-                new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].astype (float)
-                new_df['Value [V/m]'] = new_df['Value [V/m]'].map (lambda p: float (p.replace (',', '.')))
-                new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'] * 0.000001
-                new_df = new_df.rename (columns = {'Value [V/m]': Dataframe})
-                dfObj = pd.concat ([dfObj, new_df], axis = 1)
+                if dfcol == 2:
+                    result_type1 = result_type.iloc[0][1]
+                    frec_position = df[df.iloc[:, 0].str.contains('^Frequency', regex = True)]
+                    frec_position = frec_position.index.item()
+                    headers = df.iloc[frec_position]
+                    new_df = pd.DataFrame(df.values[frec_position + 1:], columns = headers)
+                    new_df = new_df.iloc[:, 0:dfcol]
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].astype(float)
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'] * 0.000001
+                    new_df['Value [V/m]'] = new_df['Value [V/m]'].map(lambda p: float(p.replace(',', '.')))
+                    new_df = new_df.rename(columns = {'Value [V/m]': Dataframe + " " + result_type1})
+                    dfObj = pd.concat([dfObj, new_df], axis = 1)
+                if dfcol == 3:
+                    result_type1 = result_type.iloc[0][1]
+                    result_type2 = result_type.iloc[0][2]
+                    frec_position = df[df.iloc[:, 0].str.contains('^Frequency', regex = True)]
+                    frec_position = frec_position.index.item()
+                    headers = df.iloc[frec_position]
+                    new_df = pd.DataFrame(df.values[frec_position + 1:], columns = headers)
+                    new_df = new_df.iloc[:, 0:dfcol]
+                    new_df = df_column_uniquify(new_df)
+                    new_df['Value [V/m]'] = new_df['Value [V/m]'].map(lambda p: float(p.replace(',', '.')))
+                    new_df['Value [V/m]_1'] = new_df['Value [V/m]_1'].map(lambda p: float(p.replace(',', '.')))
+                    new_df = new_df.rename(columns = {'Value [V/m]': Dataframe + " " + result_type1, 'Value [V/m]_1': Dataframe + " " + result_type2})
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].astype(float)
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'] * 0.000001
+                    dfObj = pd.concat([dfObj, new_df], axis = 1)
+                if dfcol == 4:
+                    result_type1 = result_type.iloc[0][1]
+                    result_type2 = result_type.iloc[0][2]
+                    result_type3 = result_type.iloc[0][3]
+                    frec_position = df[df.iloc[:, 0].str.contains('^Frequency', regex = True)]
+                    frec_position = frec_position.index.item()
+                    headers = df.iloc[frec_position]
+                    new_df = pd.DataFrame(df.values[frec_position + 1:], columns = headers)
+                    new_df = new_df.iloc[:, 0:dfcol]
+                    new_df = df_column_uniquify(new_df)
+                    new_df['Value [V/m]'] = new_df['Value [V/m]'].map(lambda p: float(p.replace(',', '.')))
+                    new_df['Value [V/m]_1'] = new_df['Value [V/m]_1'].map(lambda p: float(p.replace(',', '.')))
+                    new_df = new_df.rename(columns = {'Value [V/m]': Dataframe + " " + result_type1, 'Value [V/m]_1': Dataframe + " " + result_type2,'Value [V/m]_2': Dataframe + " " + result_type3})
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].astype(float)
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'] * 0.000001
+                    dfObj = pd.concat([dfObj, new_df], axis = 1)
         dfObj.columns.values[0] = 'Frequency Hz'
-        dfObj = dfObj.set_index (['Frequency Hz'])
+        dfObj = dfObj.set_index(['Frequency Hz'])
+        print(dfObj)
         if 'Frequency [Hz]' in dfObj.columns:
             dfObj = dfObj.drop (columns = 'Frequency [Hz]')
             dfObj = dfObj.reindex (sorted (dfObj.columns), axis = 1)
@@ -343,11 +405,9 @@ def file_aggregation():
         else:
             dfObj['Frequency Hz'] = dfObj.index
             return dfObj
-       except Exception as e:
+    except Exception as e:
         print(e)
-                return html.Div([
-            'Błąd w odczycie pliku.'
-            ])
+
 
 def RMS(Dataframeplot):
         dfObj = pd.DataFrame ([])
@@ -408,6 +468,18 @@ def recursively_remove_files(f):
         for fi in os.listdir(f):
             recursively_remove_files(os.path.join(f, fi))
 
+def df_column_uniquify(df):
+    df_columns = df.columns
+    new_columns = []
+    for item in df_columns:
+        counter = 0
+        newitem = item
+        while newitem in new_columns:
+            counter += 1
+            newitem = "{}_{}".format(item, counter)
+        new_columns.append(newitem)
+    df.columns = new_columns
+    return df
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=8888)
