@@ -11,7 +11,6 @@ import fnmatch
 from sqlalchemy import create_engine
 import contextlib
 from sqlalchemy import MetaData
-from ludwig.utils import data_utils
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
