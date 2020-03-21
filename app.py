@@ -14,9 +14,9 @@ from sqlalchemy import MetaData
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
-engine = create_engine(
-'sqlite:///app.db',
-connect_args={'check_same_thread': False}
+engine = create_engine (
+    'sqlite:///app.db',
+    connect_args = {'check_same_thread': False}
 )
 meta = MetaData()
 
@@ -25,9 +25,8 @@ with contextlib.closing(engine.connect()) as con:
     for table in reversed(meta.sorted_tables):
         con.execute(table.delete())
     trans.commit()
-
-if not os.path.exists(UPLOAD_DIRECTORY):
-    os.makedirs(UPLOAD_DIRECTORY)
+if not os.path.exists (UPLOAD_DIRECTORY):
+    os.makedirs (UPLOAD_DIRECTORY)
 
 
 
@@ -65,11 +64,8 @@ app.layout = html.Div( children = [
     )
             ],
     ),
-        html.Div(
-        id='table',
-        style={'display': 'none'}
+        html.Div(id ='table'),
 
-    ),
 
 
     html.P(),
@@ -162,6 +158,7 @@ def uploaded_files():
             files.append(filename)
     return files
 
+
 @app.callback(
     Output("table", "children"),
     [Input("upload-data", "filename"), Input("upload-data", "contents")],
@@ -173,9 +170,9 @@ def save_files(uploaded_filenames, uploaded_file_contents):
                 save_file(name, data)
         dff = file_aggregation()
         recursively_remove_files(UPLOAD_DIRECTORY)
-        return dff.to_json(orient = 'records')
+        return dff.to_sql('dataframe', engine, if_exists = 'replace', index = False)
     except Exception as e:
-        return html.Div(['There was an error processing this file.'])
+        return html.Div(['Wystąpił błąd w odczycie pliku/plików .csv, sprawdź pliki'])
 
 @app.callback(
      Output("graph", "figure"),
@@ -188,7 +185,7 @@ def save_files(uploaded_filenames, uploaded_file_contents):
      ]
 )
 def update_graph(data, yaxis_type, min_freq, max_freq, func_type):
-    dff = pd.read_json(data)
+    dff = pd.read_sql_table('dataframe', con = engine)
     dff.set_index('Frequency Hz', inplace = True)
     if func_type == 'AVG': dff = dff.filter(regex = 'AVG')
     if func_type == 'ACT': dff = dff.filter(regex = 'ACT')
@@ -224,7 +221,7 @@ def update_graph(data, yaxis_type, min_freq, max_freq, func_type):
     ]
 )
 def update_graph_aggregate(data, agg_type):
-    dff = pd.read_json(data)
+    dff = pd.read_sql_table('dataframe', con = engine)
     dff.set_index('Frequency Hz', inplace = True)
     if agg_type == 'RMS':
         newdff = RMS(dff)
