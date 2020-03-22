@@ -58,7 +58,7 @@ app.layout = html.Div( children = [
             multiple = True,
 ),
     html.P (
-            """Przykładowe pliki do pobrania: https://gofile.io/?c=IBAqzP """,
+            """Przykładowe pliki do pobrania: https://www.dropbox.com/sh/j2h6jw9h6h124y4/AAAZa5M5kfNJ3L0BJ4s6IN6Ka?dl=0 """,
             style = {
                 'textAlign': 'center', }
     )
