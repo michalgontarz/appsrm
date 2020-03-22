@@ -64,7 +64,8 @@ app.layout = html.Div( children = [
     )
             ],
     ),
-        html.Div(id ='table'),
+        html.Div(id ='table',
+                     style={'color': 'red'}),
 
 
 
