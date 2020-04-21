@@ -12,9 +12,13 @@ from sqlalchemy import create_engine
 import contextlib
 from sqlalchemy import MetaData
 from rq import Queue
-from worker import conn
+from redis import Redis
+from somewhere import count_words_at_url
+import time
 
-q = Queue(connection=conn)
+# Tell RQ what Redis connection to use
+redis_conn = Redis()
+q = Queue(connection=redis_conn)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
@@ -173,7 +177,7 @@ def save_files(uploaded_filenames, uploaded_file_contents):
         if uploaded_filenames is not None and uploaded_file_contents is not None:
             for name, data in zip(uploaded_filenames, uploaded_file_contents):
                 save_file(name, data)
-        dff = q.enqueue(file_aggregation())
+        dff =  q.enqueue(file_aggregation())
         recursively_remove_files(UPLOAD_DIRECTORY)
         return dff.to_sql('dataframe', engine, if_exists = 'replace', index = False)
     except Exception as e:
