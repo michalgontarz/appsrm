@@ -359,7 +359,7 @@ def file_aggregation():
                     headers = df.iloc[frec_position]
                     new_df = pd.DataFrame(df.values[frec_position + 1:], columns = headers)
                     new_df = new_df.iloc[:, 0:dfcol]
-                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].astype(float)
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].replace(',', '.', regex=True).astype(float)
                     new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'] * 0.000001
                     new_df['Value [V/m]'] = new_df['Value [V/m]'].replace(',', '.', regex=True).astype(float)
                     new_df['Value [V/m]'] = new_df['Value [V/m]'].apply(lambda x: round(x, 7))
@@ -379,7 +379,7 @@ def file_aggregation():
                     new_df['Value [V/m]'] = new_df['Value [V/m]'].apply(lambda x: round(x, 7))
                     new_df['Value [V/m]_1'] = new_df['Value [V/m]_1'].apply(lambda x: round(x, 7))
                     new_df = new_df.rename(columns = {'Value [V/m]': Dataframe + " " + result_type1, 'Value [V/m]_1': Dataframe + " " + result_type2})
-                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].astype(float)
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].replace(',', '.', regex=True).astype(float)
                     new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'] * 0.000001
                     dfObj = pd.concat([dfObj, new_df], axis = 1)
                 if dfcol == 4:
@@ -400,7 +400,7 @@ def file_aggregation():
                     new_df['Value [V/m]_2'] = new_df['Value [V/m]_2'].apply(lambda x: round(x, 7))
                     new_df = new_df.rename(columns = {'Value [V/m]': Dataframe + " " + result_type1, 'Value [V/m]_1': Dataframe + " " + result_type2,'Value [V/m]_2': Dataframe + " " + result_type3})
                     print(new_df)
-                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].astype(float)
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].replace(',', '.', regex=True).astype(float)
                     new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'] * 0.000001
                     dfObj = pd.concat([dfObj, new_df], axis = 1)
                 if dfcol == 5:
@@ -418,15 +418,15 @@ def file_aggregation():
                     new_df['Value [V/m]_1'] = new_df['Value [V/m]_1'].replace(',', '.', regex = True).astype(float)
                     new_df['Value [V/m]_2'] = new_df['Value [V/m]_2'].replace(',', '.', regex = True).astype(float)
                     new_df['Value [V/m]_3'] = new_df['Value [V/m]_3'].replace(',', '.', regex = True).astype(float)
-                    new_df['Value [V/m]'] = new_df['Value [V/m]'].apply(lambda x: round(x, 7))
-                    new_df['Value [V/m]_1'] = new_df['Value [V/m]_1'].apply(lambda x: round(x, 7))
-                    new_df['Value [V/m]_2'] = new_df['Value [V/m]_2'].apply(lambda x: round(x, 7))
-                    new_df['Value [V/m]_3'] = new_df['Value [V/m]_3'].apply(lambda x: round(x, 7))
+                    new_df['Value [V/m]'] = new_df['Value [V/m]'].apply(lambda x: round(x, 8))
+                    new_df['Value [V/m]_1'] = new_df['Value [V/m]_1'].apply(lambda x: round(x, 8))
+                    new_df['Value [V/m]_2'] = new_df['Value [V/m]_2'].apply(lambda x: round(x, 8))
+                    new_df['Value [V/m]_3'] = new_df['Value [V/m]_3'].apply(lambda x: round(x, 8))
                     new_df = new_df.rename(columns = {'Value [V/m]': Dataframe + " " + result_type1,
                                                       'Value [V/m]_1': Dataframe + " " + result_type2,
                                                       'Value [V/m]_2': Dataframe + " " + result_type3,
                                                       'Value [V/m]_3': Dataframe + " " + result_type4})
-                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].astype(float)
+                    new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'].replace(',', '.', regex=True).astype(float)
                     new_df['Frequency [Hz]'] = new_df['Frequency [Hz]'] * 0.000001
                     dfObj = pd.concat([dfObj, new_df], axis = 1)
         dfObj.columns.values[0] = 'Frequency Hz'
