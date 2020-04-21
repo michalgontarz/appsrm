@@ -11,8 +11,10 @@ import fnmatch
 from sqlalchemy import create_engine
 import contextlib
 from sqlalchemy import MetaData
-from rq import Queue
-from worker import conn
+
+
+import redis
+from rq import Worker, Queue, Connection
 
 q = Queue(connection=conn)
 q = Queue(connection=redis.Redis('redis://redistogo:58c9xxx351fb7de6653c4a7915a97115@cobia.redistogo.com','9630'))
