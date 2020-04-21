@@ -85,7 +85,7 @@ app.layout = html.Div( children = [
                         html.Div(className = 'row', children = [
                             dcc.RadioItems(
                                 id = 'func-type',
-                                options = [{'label': i, 'value': i} for i in ['ALL','ACT', 'MIN', 'MAX', 'AVG']],
+                                options = [{'label': i, 'value': i} for i in ['ALL','ACT', 'MIN', 'MAX', 'AVG', 'MAX_AVG', 'MIN_AVG']],
                                 value = 'ALL',
                                 labelStyle = {"display": "inline-block"},
                             ),
@@ -194,6 +194,8 @@ def update_graph(data, yaxis_type, min_freq, max_freq, func_type):
     if func_type == 'ACT': dff = dff.filter(regex = 'ACT')
     if func_type == 'MIN': dff = dff.filter(regex = 'MIN')
     if func_type == 'MAX': dff = dff.filter(regex = 'MAX')
+    if func_type == 'MAX_AVG': dff = dff.filter(regex = 'MAX_AVG')
+    if func_type == 'MIN_AVG': dff = dff.filter(regex = 'MIN_AVG')
 
     traces = []
     for col in dff.columns:
