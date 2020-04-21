@@ -12,11 +12,9 @@ from sqlalchemy import create_engine
 import contextlib
 from sqlalchemy import MetaData
 from rq import Queue
-from redis import Redis
+from worker import conn
 
-# Tell RQ what Redis connection to use
-redis_conn = Redis()
-q = Queue(connection=redis_conn)
+q = Queue(connection=conn)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
