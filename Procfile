@@ -1,4 +1,4 @@
-web: gunicorn app:server
+web: gunicorn app:server --timeout 120
 heroku ps:scale web=1 worker=100
-web: bundle exec unicorn -p $PORT -c ./config/unicorn.rb
+
 
