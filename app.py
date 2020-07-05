@@ -34,7 +34,7 @@ if not os.path.exists (UPLOAD_DIRECTORY):
 '''
 SERVER = '172.31.82.179'
 DATABASE = 'CamelotWarehouse'
-DRIVER = 'SQL Server Native Client 11.0'
+DRIVER = 'ODBC Driver 11 for SQL Server'
 USERNAME = 'michal.gontarz'
 PASSWORD = 'uh@s5ACX3mc=2wFF'
 
