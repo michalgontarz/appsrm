@@ -11,7 +11,7 @@ import fnmatch
 from sqlalchemy import create_engine
 import contextlib
 from sqlalchemy import MetaData
-import pyodbc
+import pypyodbc
 #s
 
 
@@ -31,7 +31,7 @@ with contextlib.closing(engine.connect()) as con:
 if not os.path.exists (UPLOAD_DIRECTORY):
     os.makedirs (UPLOAD_DIRECTORY)
 def connectSQLServer(driver, server, db, username, password):
-    connSQLServer = pyodbc.connect(
+    connSQLServer = pypyodbc.connect(
         r'DRIVER={' + driver + '};'
                                r'SERVER=' + server + ';'
                                                      r'DATABASE=' + db + ';'
