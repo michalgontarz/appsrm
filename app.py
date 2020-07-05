@@ -36,7 +36,7 @@ DATABASE = 'CamelotWarehouse'
 DRIVER = 'SQL Server Native Client 11.0'
 USERNAME = 'michal.gontarz'
 PASSWORD = 'uh@s5ACX3mc=2wFF'
-DATABASE_CONNECTION = f'mssql://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}'
+DATABASE_CONNECTION = f'mssql+pyodbc://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}'
 engine1 = create_engine(DATABASE_CONNECTION)
 connection = engine1.connect()
 data = pd.read_sql_query(
