@@ -11,13 +11,12 @@ import fnmatch
 from sqlalchemy import create_engine
 import contextlib
 from sqlalchemy import MetaData
-import pyodbc
-#sd
+
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = "tmp/project/app_uploaded_files"
-'''
+
 engine = create_engine (
     'sqlite:///app.db',
     connect_args = {'check_same_thread': False}
@@ -31,24 +30,6 @@ with contextlib.closing(engine.connect()) as con:
     trans.commit()
 if not os.path.exists (UPLOAD_DIRECTORY):
     os.makedirs (UPLOAD_DIRECTORY)
-'''
-SERVER = '172.31.82.179'
-DATABASE = 'CamelotWarehouse'
-DRIVER = 'ODBC Driver 11 for SQL Server'
-USERNAME = 'michal.gontarz'
-PASSWORD = 'uh@s5ACX3mc=2wFF'
-
-DATABASE_CONNECTION = f'mssql+pyodbc://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}'
-engine1 = create_engine(DATABASE_CONNECTION)
-connection = engine1.connect()
-data = pd.read_sql_query(
-    'select * from Avalon..tmp_RaportDzSprz_Kampanie where [month] = convert(varchar(7), (select top 1[Day] from ['
-    'CamelotWarehousePlayground].[dbo].[Params_DaysOff] d2 with(nolock) where d2.[Day] < cast(getdate() as date) and '
-    'd2.[State] = \'WorkDay\' order by[Day] desc), 120) ', connection)
-
-
-
-df4 = data
 
 
 server = Flask(__name__)
