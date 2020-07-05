@@ -26,3 +26,4 @@ rq>=0.13
 bundle==1.1.2
 yolk==0.4.3
 xlrd==1.2.0
+pyodbc==4.0.30
