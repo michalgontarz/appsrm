@@ -46,7 +46,6 @@ app.layout = html.Div( children = [
             style = {
                 'textAlign': 'center',}
             ),
-    html.P("{CRM}".format(CRM=df4)),
     html.P(
              """Użyj przycisku poniżej aby wczytać dane do analizy z pliku .csv""",
         style = {
