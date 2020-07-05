@@ -30,30 +30,23 @@ with contextlib.closing(engine.connect()) as con:
     trans.commit()
 if not os.path.exists (UPLOAD_DIRECTORY):
     os.makedirs (UPLOAD_DIRECTORY)
-def connectSQLServer(driver, server, db, username, password):
-    connSQLServer = pypyodbc.connect(
-        r'DRIVER={' + driver + '};'
-                               r'SERVER=' + server + ';'
-                                                     r'DATABASE=' + db + ';'
-                                                                         r'UID=' + username + ';'
-                                                                                              r'PWD=' + password + ';',
-        autocommit=True
-    )
-    return connSQLServer
+
+SERVER = '172.31.82.179'
+DATABASE = 'CamelotWarehouse'
+DRIVER = 'SQL Server Native Client 11.0'
+USERNAME = 'michal.gontarz'
+PASSWORD = 'uh@s5ACX3mc=2wFF'
+DATABASE_CONNECTION = f'mssql://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}'
+engine1 = create_engine(DATABASE_CONNECTION)
+connection = engine1.connect()
+data = pd.read_sql_query(
+    'select * from Avalon..tmp_RaportDzSprz_Kampanie where [month] = convert(varchar(7), (select top 1[Day] from ['
+    'CamelotWarehousePlayground].[dbo].[Params_DaysOff] d2 with(nolock) where d2.[Day] < cast(getdate() as date) and '
+    'd2.[State] = \'WorkDay\' order by[Day] desc), 120) ', connection)
 
 
-def getadata2():
-    sql_conn = connectSQLServer('ODBC Driver 11 for SQL Server', '172.31.82.179', 'CamelotWarehouse',
-                                'michal.gontarz', 'uh@s5ACX3mc=2wFF')
-    sql2 = 'select * from Avalon..tmp_RaportDzSprz_Kampanie where [month] = convert(varchar(7), (select top 1[Day] ' \
-           'from [CamelotWarehousePlayground].[dbo].[Params_DaysOff] d2 with(nolock) where d2.[Day] < cast(getdate() ' \
-           'as date) and d2.[State] = \'WorkDay\' order by[Day] desc), 120) '
-    df3 = pd.io.sql.read_sql(sql2, sql_conn)
-    if df3.empty:
-        return "BRAK UMÓW"
-    return df
 
-df4 = getadata2()
+df4 = data
 
 
 server = Flask(__name__)
