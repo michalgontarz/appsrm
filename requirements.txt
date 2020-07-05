@@ -27,5 +27,4 @@ bundle==1.1.2
 yolk==0.4.3
 pyodbc==4.0.30
 xlrd==1.2.0
-unixodbc-dev==2.3.7
-
+unixodbc-dev
