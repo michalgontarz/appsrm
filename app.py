@@ -36,8 +36,8 @@ DATABASE = 'CamelotWarehouse'
 DRIVER = 'SQL Server Native Client 11.0'
 USERNAME = 'michal.gontarz'
 PASSWORD = 'uh@s5ACX3mc=2wFF'
-DATABASE_CONNECTION = f'mssql+pyodbc://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}'
-engine1 = create_engine(DATABASE_CONNECTION)
+
+engine1 = create_engine('mssql+pyodbc://{USERNAME}:{PASSWORD}@{SERVER}/{DATABASE}?driver={DRIVER}')
 connection = engine1.connect()
 data = pd.read_sql_query(
     'select * from Avalon..tmp_RaportDzSprz_Kampanie where [month] = convert(varchar(7), (select top 1[Day] from ['
